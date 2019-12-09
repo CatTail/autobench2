@@ -8,7 +8,7 @@ import sys
 @click.argument('url')
 # autobench2 command line options
 @click.option('--verbose', is_flag=True, default=False, help='Print verbose messages')
-@click.option('--warmup', required=True, help='Duration of warm-up')
+@click.option('--warmup_duration', required=True, help='Duration of warm-up')
 @click.option('--low_rate', required=True, type=int, help='The initial rate')
 @click.option('--high_rate', required=True, type=int, help='The final rate')
 @click.option('--rate_step', required=True, type=int, help='The step to increase from low rate to high rate')
@@ -25,14 +25,36 @@ import sys
 @click.option('-B', '--batch_latency', is_flag=True, default=False,
               help='Measure latency of whole batches of pipelined ops (as opposed to each op)')
 @click.version_option()
-def cli(url, verbose, warmup, low_rate, high_rate, rate_step, file, **args):
-    if verbose:
-        click.echo('get command line options {}'.format(args))
-
+def cli(url, verbose, warmup_duration, duration, low_rate, high_rate, rate_step, file, **args):
     if shutil.which('wrk') is None:
         sys.exit('wrk2 not installed')
 
-    cmd = ['wrk']
+    click.echo('sending warm-up traffic')
+    execute_command(verbose, low_rate, warmup_duration, url, args)
+
+    for rate in inclusive_range(low_rate, high_rate, rate_step):
+        execute_command(verbose, rate, duration, url, args)
+
+
+def execute_command(verbose, rate, duration, url, args):
+    command = get_command(rate, duration, url, args)
+
+    if verbose:
+        click.echo('executing command: {}'.format(' '.join(command)))
+
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    click.echo(stdout)
+    click.secho(stderr.decode("utf-8"), fg='red', err=True)
+
+    if process.returncode != 0:
+        sys.exit(process.returncode)
+
+    return stdout
+
+
+def get_command(rate, duration, url, args):
+    cmd = ['wrk', '--rate', str(rate), '--duration', str(duration)]
     for key, value in args.items():
         if value is not None:
             # skip flag option value
@@ -41,22 +63,8 @@ def cli(url, verbose, warmup, low_rate, high_rate, rate_step, file, **args):
                 cmd.append(str(value))
             elif value is True:
                 cmd.append('--{}'.format(key))
-
-    for rate in inclusive_range(low_rate, high_rate, rate_step):
-        command = cmd.copy()
-
-        command.append('--rate')
-        command.append(str(rate))
-
-        command.append(url)
-
-        if verbose:
-            click.echo('executing command: {}'.format(' '.join(command)))
-
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        click.echo(stdout)
-        click.secho(stderr.decode("utf-8"), fg='red', err=True)
+    cmd.append(url)
+    return cmd
 
 
 def inclusive_range(start, stop, step):
