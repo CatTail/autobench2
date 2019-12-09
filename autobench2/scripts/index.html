@@ -1,0 +1,49 @@
+<html>
+<head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages': ['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        fetch("/report.json").then(response => response.json()).then(report => {
+          const percentiles = ["50.000%", "75.000%", "90.000%", "99.000%", "99.900%", "99.990%", "99.999%"];
+          const rows = [['Throughput (Req/s)'].concat(percentiles)];
+
+          for (const throughput in report) {
+            const stdout = report[throughput];
+            const lines = stdout.split('\n');
+            const row = [throughput];
+            percentiles.map(percentile => {
+              lines.forEach(line => {
+                const reg = new RegExp(`^\\s*${percentile}\\s*(.+)ms\\s*$`);
+                const matches = reg.exec(line);
+                if (matches) {
+                  row.push(Number(matches[1].trim()));
+                }
+              });
+            });
+            rows.push(row)
+          }
+
+          const data = google.visualization.arrayToDataTable(rows);
+
+          const options = {
+            title: 'Throughput vs Latency',
+            curveType: 'function',
+          };
+
+          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+          chart.draw(data, options);
+        })
+
+      }
+    </script>
+</head>
+
+<body>
+<div id="chart_div" style="width: 900px; height: 500px"></div>
+</body>
+</html>
