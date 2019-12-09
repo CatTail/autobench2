@@ -21,11 +21,7 @@ import click
 @click.option('-t', '--threads', required=True, type=int, help='Number of threads to use')
 @click.option('-s', '--script', help='Load Lua script fil')
 @click.option('-H', '--header', help='Add header to request')
-@click.option('-L', '--latency', is_flag=True, default=False, help='Print latency statistics')
-@click.option('-U', '--u_latency', is_flag=True, default=False, help='Print uncorrected latency statistics')
 @click.option('--timeout', type=int, help='Record a timeout if a response is not received within this amount of time.')
-@click.option('-B', '--batch_latency', is_flag=True, default=False,
-              help='Measure latency of whole batches of pipelined ops (as opposed to each op)')
 @click.version_option()
 def cli(url, verbose, warmup_duration, duration, low_rate, high_rate, rate_step, file, **args):
     if shutil.which('wrk') is None:
@@ -61,7 +57,7 @@ def execute_command(verbose, rate, duration, url, args):
 
 
 def get_command(rate, duration, url, args):
-    cmd = ['wrk', '--rate', str(rate), '--duration', str(duration)]
+    cmd = ['wrk', '--rate', str(rate), '--duration', str(duration), '--latency']
     for key, value in args.items():
         if value is not None:
             # skip flag option value
