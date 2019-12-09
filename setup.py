@@ -2,7 +2,6 @@
 
 from setuptools import setup, find_packages
 
-
 with open('README.rst') as f:
     readme = f.read()
 
@@ -11,7 +10,7 @@ with open('LICENSE') as f:
 
 setup(
     name='autobench2',
-    version='0.1.0',
+    version='0.1.1',
     description='HTTP benchmarking suite for wrk2',
     long_description=readme,
     author='Chiyu Zhong',
@@ -22,4 +21,5 @@ setup(
     entry_points={
         'console_scripts': ['autobench=autobench2.cli:cli']
     },
+    install_requires=['click>=7.0']
 )
