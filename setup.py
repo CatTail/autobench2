@@ -10,7 +10,7 @@ with open('LICENSE') as f:
 
 setup(
     name='autobench2',
-    version='0.1.1',
+    version='0.1.2',
     description='HTTP benchmarking suite for wrk2',
     long_description=readme,
     author='Chiyu Zhong',
