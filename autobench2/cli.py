@@ -1,7 +1,9 @@
-import click
+import json
 import shutil
 import subprocess
 import sys
+
+import click
 
 
 @click.command()
@@ -32,8 +34,13 @@ def cli(url, verbose, warmup_duration, duration, low_rate, high_rate, rate_step,
     click.echo('sending warm-up traffic')
     execute_command(verbose, low_rate, warmup_duration, url, args)
 
+    result = {}
     for rate in inclusive_range(low_rate, high_rate, rate_step):
-        execute_command(verbose, rate, duration, url, args)
+        stdout = execute_command(verbose, rate, duration, url, args)
+        result[rate] = stdout
+
+    with open(file, 'w') as f:
+        f.write(json.dumps(result))
 
 
 def execute_command(verbose, rate, duration, url, args):
@@ -50,7 +57,7 @@ def execute_command(verbose, rate, duration, url, args):
     if process.returncode != 0:
         sys.exit(process.returncode)
 
-    return stdout
+    return stdout.decode("utf-8")
 
 
 def get_command(rate, duration, url, args):
