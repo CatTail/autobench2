@@ -4,48 +4,91 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages': ['corechart']});
-      // google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart(files) {
+      google.charts.setOnLoadCallback(onLoadCallback);
+
+      const exampleReport = {
+        "10": "thread addr: ::1:8080\nthread addr: fe80::1%lo0:8080\nthread addr: 127.0.0.1:8080\nthread addr: ::1:8080\nRunning 1m test @ http://example.com\n  4 threads and 8 connections\n  Thread calibration: mean lat.: 42.857ms, rate sampling interval: 115ms\n  Thread calibration: mean lat.: 45.698ms, rate sampling interval: 123ms\n  Thread calibration: mean lat.: 46.667ms, rate sampling interval: 123ms\n  Thread calibration: mean lat.: 44.959ms, rate sampling interval: 118ms\n  Thread Stats   Avg      Stdev     Max   +/- Stdev\n    Latency    43.06ms   16.75ms 134.53ms   76.21%\n    Req/Sec     2.42      5.49    17.00     87.03%\n  Latency Distribution (HdrHistogram - Recorded Latency)\n 50.000%   43.84ms\n 75.000%   52.03ms\n 90.000%   59.65ms\n 99.000%   83.01ms\n 99.900%  134.65ms\n 99.990%  134.65ms\n 99.999%  134.65ms\n100.000%  134.65ms\n\n  Detailed Percentile spectrum:\n       Value   Percentile   TotalCount 1/(1-Percentile)\n\n       4.507     0.000000            1         1.00\n      17.743     0.100000           50         1.11\n      34.463     0.200000          100         1.25\n      37.919     0.300000          149         1.43\n      40.831     0.400000          199         1.67\n      43.839     0.500000          248         2.00\n      45.503     0.550000          275         2.22\n      46.591     0.600000          298         2.50\n      48.191     0.650000          323         2.86\n      49.791     0.700000          348         3.33\n      52.031     0.750000          372         4.00\n      52.703     0.775000          386         4.44\n      53.759     0.800000          397         5.00\n      54.975     0.825000          410         5.71\n      56.511     0.850000          422         6.67\n      57.759     0.875000          434         8.00\n      59.295     0.887500          442         8.89\n      59.711     0.900000          447        10.00\n      60.895     0.912500          453        11.43\n      61.759     0.925000          459        13.33\n      63.551     0.937500          465        16.00\n      64.447     0.943750          469        17.78\n      65.311     0.950000          472        20.00\n      67.071     0.956250          475        22.86\n      68.287     0.962500          479        26.67\n      70.655     0.968750          481        32.00\n      71.615     0.971875          483        35.56\n      72.319     0.975000          484        40.00\n      75.135     0.978125          486        45.71\n      75.583     0.981250          487        53.33\n      79.871     0.984375          489        64.00\n      82.175     0.985938          490        71.11\n      82.175     0.987500          490        80.00\n      83.007     0.989062          491        91.43\n     101.503     0.990625          492       106.67\n     105.151     0.992188          493       128.00\n     105.151     0.992969          493       142.22\n     105.151     0.993750          493       160.00\n     129.087     0.994531          494       182.86\n     129.087     0.995313          494       213.33\n     132.735     0.996094          495       256.00\n     132.735     0.996484          495       284.44\n     132.735     0.996875          495       320.00\n     132.735     0.997266          495       365.71\n     132.735     0.997656          495       426.67\n     134.655     0.998047          496       512.00\n     134.655     1.000000          496          inf\n#[Mean    =       43.062, StdDeviation   =       16.751]\n#[Max     =      134.528, Total count    =          496]\n#[Buckets =           27, SubBuckets     =         2048]\n----------------------------------------------------------\n  604 requests in 1.00m, 3.96MB read\n  Non-2xx or 3xx responses: 91\nRequests/sec:     10.06\nTransfer/sec:     67.59KB\n",
+        "20": "thread addr: ::1:8080\nthread addr: fe80::1%lo0:8080\nthread addr: 127.0.0.1:8080\nthread addr: ::1:8080\nRunning 1m test @ http://example.com\n  4 threads and 8 connections\n  Thread calibration: mean lat.: 37.907ms, rate sampling interval: 106ms\n  Thread calibration: mean lat.: 40.917ms, rate sampling interval: 107ms\n  Thread calibration: mean lat.: 41.852ms, rate sampling interval: 113ms\n  Thread calibration: mean lat.: 39.059ms, rate sampling interval: 104ms\n  Thread Stats   Avg      Stdev     Max   +/- Stdev\n    Latency    43.37ms   17.99ms 136.70ms   73.50%\n    Req/Sec     4.89      7.59    19.00     76.44%\n  Latency Distribution (HdrHistogram - Recorded Latency)\n 50.000%   43.17ms\n 75.000%   52.45ms\n 90.000%   64.16ms\n 99.000%   94.72ms\n 99.900%  129.66ms\n 99.990%  136.83ms\n 99.999%  136.83ms\n100.000%  136.83ms\n\n  Detailed Percentile spectrum:\n       Value   Percentile   TotalCount 1/(1-Percentile)\n\n       3.979     0.000000            1         1.00\n      17.231     0.100000          100         1.11\n      32.959     0.200000          200         1.25\n      37.087     0.300000          300         1.43\n      40.383     0.400000          400         1.67\n      43.167     0.500000          500         2.00\n      44.735     0.550000          550         2.22\n      46.175     0.600000          601         2.50\n      48.191     0.650000          650         2.86\n      50.751     0.700000          700         3.33\n      52.447     0.750000          750         4.00\n      53.823     0.775000          775         4.44\n      55.199     0.800000          800         5.00\n      56.735     0.825000          825         5.71\n      58.335     0.850000          850         6.67\n      60.927     0.875000          875         8.00\n      63.071     0.887500          888         8.89\n      64.159     0.900000          900        10.00\n      65.471     0.912500          913        11.43\n      67.391     0.925000          925        13.33\n      69.503     0.937500          938        16.00\n      70.271     0.943750          944        17.78\n      71.743     0.950000          950        20.00\n      74.815     0.956250          957        22.86\n      76.607     0.962500          963        26.67\n      78.399     0.968750          969        32.00\n      78.783     0.971875          972        35.56\n      80.447     0.975000          975        40.00\n      84.095     0.978125          979        45.71\n      85.887     0.981250          982        53.33\n      87.871     0.984375          985        64.00\n      89.535     0.985938          986        71.11\n      92.927     0.987500          988        80.00\n      94.719     0.989062          990        91.43\n      94.911     0.990625          991       106.67\n      97.279     0.992188          993       128.00\n      97.279     0.992969          993       142.22\n      98.367     0.993750          994       160.00\n     102.911     0.994531          995       182.86\n     106.367     0.995313          996       213.33\n     119.999     0.996094          997       256.00\n     119.999     0.996484          997       284.44\n     119.999     0.996875          997       320.00\n     123.903     0.997266          998       365.71\n     123.903     0.997656          998       426.67\n     129.663     0.998047          999       512.00\n     129.663     0.998242          999       568.89\n     129.663     0.998437          999       640.00\n     129.663     0.998633          999       731.43\n     129.663     0.998828          999       853.33\n     136.831     0.999023         1000      1024.00\n     136.831     1.000000         1000          inf\n#[Mean    =       43.369, StdDeviation   =       17.991]\n#[Max     =      136.704, Total count    =         1000]\n#[Buckets =           27, SubBuckets     =         2048]\n----------------------------------------------------------\n  1201 requests in 1.00m, 7.89MB read\n  Non-2xx or 3xx responses: 185\nRequests/sec:     20.01\nTransfer/sec:    134.56KB\n"
+      };
+
+      function onLoadCallback() {
+        drawChart(parseReport(exampleReport));
+      }
+
+      function onchange(files) {
         const selectedFile = files[0];
-        selectedFile.text().then(text => JSON.parse(text)).then(report => {
-          const percentiles = ["50.000%", "75.000%", "90.000%", "99.000%", "99.900%", "99.990%", "99.999%"];
-          const rows = [['Throughput (Req/s)'].concat(percentiles)];
+        selectedFile.text().then(text => JSON.parse(text)).then(parseReport).then(drawChart);
+      }
 
-          for (const throughput in report) {
-            const stdout = report[throughput];
-            const lines = stdout.split('\n');
-            const row = [throughput];
-            percentiles.map(percentile => {
-              lines.forEach(line => {
-                const reg = new RegExp(`^\\s*${percentile}\\s*(.+)ms\\s*$`);
-                const matches = reg.exec(line);
-                if (matches) {
-                  row.push(Number(matches[1].trim()));
-                }
-              });
+      const percentiles = ["50.000%", "75.000%", "90.000%", "99.000%", "99.900%", "99.990%", "99.999%"];
+      const percentileReg = function (percentile) {
+        return new RegExp(`^\\s*${percentile}\\s*(.+)ms\\s*$`);
+      }
+      const totalReg = new RegExp(/^\s*(\d+) requests in/);
+      const errReg = new RegExp(/^\s*Non-2xx or 3xx responses: (\d+)\s*$/);
+
+      function parseReport(report) {
+        const data = {};
+        for (const throughput in report) {
+          const stdout = report[throughput];
+          const lines = stdout.split('\n');
+          const item = data[throughput] = {percentiles: {}, total: 0, error: 0};
+          percentiles.map(percentile => {
+            lines.forEach(line => {
+              const matches = percentileReg(percentile).exec(line);
+              if (matches) {
+                item.percentiles[percentile] = Number(matches[1].trim());
+              }
             });
-            rows.push(row)
-          }
+          });
+          lines.forEach(line => {
+            let matches = totalReg.exec(line);
+            if (matches) {
+              item.total = Number(matches[1].trim());
+            }
+            matches = errReg.exec(line);
+            if (matches) {
+              item.error = Number(matches[1].trim());
+            }
+          });
+        }
+        return data;
+      }
 
-          const data = google.visualization.arrayToDataTable(rows);
+      function drawChart(report) {
+        const rows = [['Throughput (Req/s)'].concat(percentiles)];
+        const errRows = [['Throughput (Req/s)', 'Error Rate']];
 
-          const options = {
-            title: 'Throughput vs Latency',
+        for (const throughput in report) {
+          const item = report[throughput];
+          rows.push([throughput].concat(Object.values(item.percentiles)));
+          errRows.push([throughput, item.error / item.total]);
+        }
+
+        new google.visualization.LineChart(document.getElementById('latency'))
+          .draw(google.visualization.arrayToDataTable(rows), {
+            title: 'Latency by Throughput',
             curveType: 'function',
-          };
+            // width: 1500,
+            // height: 600,
+          });
 
-          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
-          chart.draw(data, options);
-        })
-
+        new google.visualization.LineChart(document.getElementById('error-rate'))
+          .draw(google.visualization.arrayToDataTable(errRows), {
+            title: 'Error Rate by Throughput',
+            curveType: 'function',
+            // width: 1500,
+            // height: 600,
+          });
       }
     </script>
 </head>
 
 <body>
-<input type="file" id="input" onchange="drawChart(this.files)">
-<div id="chart_div" style="width: 900px; height: 500px"></div>
+<h1>HTTP Benchmark Result</h1>
+<label>Select file here to render</label> <input type="file" id="input" onchange="onchange(this.files)">
+<div id="latency" style="width: 100%; height: 600px"></div>
+<div id="error-rate" style="width: 100%; height: 600px"></div>
 </body>
 </html>
