@@ -23,7 +23,7 @@
 
       const percentiles = ["50.000%", "75.000%", "90.000%", "99.000%", "99.900%", "99.990%", "99.999%"];
       const percentileReg = function (percentile) {
-        return new RegExp(`^\\s*${percentile}\\s*(.+)ms\\s*$`);
+        return new RegExp(`^\\s*${percentile}\\s*(.+)\\s*$`);
       }
       const totalReg = new RegExp(/^\s*(\d+) requests in/);
       const errReg = new RegExp(/^\s*Non-2xx or 3xx responses: (\d+)\s*$/);
@@ -38,7 +38,7 @@
             lines.forEach(line => {
               const matches = percentileReg(percentile).exec(line);
               if (matches) {
-                item.percentiles[percentile] = Number(matches[1].trim());
+                item.percentiles[percentile] = getMillis(matches[1].trim());
               }
             });
           });
@@ -54,6 +54,23 @@
           });
         }
         return data;
+      }
+
+      // get milliseconds from string time representation
+      function getMillis(str) {
+        if (str.endsWith('ms')) {
+          return Number(str.slice(0, -2))
+        }
+
+        if (str.endsWith('s')) {
+          return Number(str.slice(0, -1)) * 1000
+        }
+
+        if (str.endsWith('m')) {
+          return Number(str.slice(0, -1)) * 60 * 1000
+        }
+
+        throw new Error(`unhandled time unit ${str}`);
       }
 
       function drawChart(report) {
