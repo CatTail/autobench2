@@ -109,6 +109,7 @@
           .draw(google.visualization.arrayToDataTable(latencyRows), {
             title: 'Latency by Rate',
             curveType: 'function',
+            focusTarget: 'category',
             hAxis: {
               title: 'Rate (Req/s)',
             },
@@ -126,6 +127,7 @@
           .draw(google.visualization.arrayToDataTable(throughputRows), {
             title: 'Throughput by Rate',
             curveType: 'function',
+            focusTarget: 'category',
             hAxis: {
               title: 'Rate (Req/s)',
             },
@@ -143,6 +145,7 @@
           .draw(google.visualization.arrayToDataTable(errRows), {
             title: 'Error Rate by Rate',
             curveType: 'function',
+            focusTarget: 'category',
             hAxis: {
               title: 'Rate (Req/s)',
             },
