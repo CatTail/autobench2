@@ -21,5 +21,7 @@ setup(
     entry_points={
         'console_scripts': ['autobench=autobench2.cli:cli']
     },
-    install_requires=['click>=7.0']
+    install_requires=['click>=7.0'],
+    include_package_data=True,
+    python_requires='>=3.6.0'
 )
