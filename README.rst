@@ -29,6 +29,8 @@ Usage
               --script wrk.lua --warmup_duration 1m --low_rate 10 \
               --high_rate 20 --rate_step 10 http://example.com/
 
+after generate report.json, open https://cattail.github.io/autobench2 to draw latency by throughput and error rate by throughput graph
+
 display help message
 
 .. code-block::
@@ -40,3 +42,4 @@ display autobench2 version
 .. code-block::
 
   $ autobench --version
+
