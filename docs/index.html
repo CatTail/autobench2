@@ -16,7 +16,7 @@
         drawChart(parseReport(exampleReport));
       }
 
-      function onchange(files) {
+      function onInputChange(files) {
         const selectedFile = files[0];
         selectedFile.text().then(text => JSON.parse(text)).then(parseReport).then(drawChart);
       }
@@ -57,6 +57,8 @@
       }
 
       function drawChart(report) {
+        console.log('draw chart for report', report);
+
         const rows = [['Throughput (Req/s)'].concat(percentiles)];
         const errRows = [['Throughput (Req/s)', 'Error Rate']];
 
@@ -87,7 +89,7 @@
 
 <body>
 <h1>HTTP Benchmark Result</h1>
-<label>Select file here to render</label> <input type="file" id="input" onchange="onchange(this.files)">
+<label>Select file here to render</label> <input type="file" id="input" onchange="onInputChange(this.files)">
 <div id="latency" style="width: 100%; height: 600px"></div>
 <div id="error-rate" style="width: 100%; height: 600px"></div>
 </body>
