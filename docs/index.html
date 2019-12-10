@@ -22,34 +22,42 @@
       }
 
       const percentiles = ["50.000%", "75.000%", "90.000%", "99.000%", "99.900%", "99.990%", "99.999%"];
-      const percentileReg = function (percentile) {
-        return new RegExp(`^\\s*${percentile}\\s*(.+)\\s*$`);
-      }
-      const totalReg = new RegExp(/^\s*(\d+) requests in/);
-      const errReg = new RegExp(/^\s*Non-2xx or 3xx responses: (\d+)\s*$/);
+      const regexs = {
+        total:  new RegExp(/^\s*(\d+) requests in/),
+        error: new RegExp(/^\s*Non-2xx or 3xx responses: (\d+)\s*$/),
+        throughput: new RegExp(/^\s*Requests\/sec:\s*(.+)\s*$/),
+        percentile(name) {
+          return new RegExp(`^\\s*${name}\\s*(.+)\\s*$`);
+        }
+      };
 
       function parseReport(report) {
         const data = {};
-        for (const throughput in report) {
-          const stdout = report[throughput];
+        for (const rate in report) {
+          const stdout = report[rate];
+          // console.log(stdout);
           const lines = stdout.split('\n');
-          const item = data[throughput] = {percentiles: {}, total: 0, error: 0};
+          const item = data[rate] = {percentiles: {}, total: 0, error: 0, throughput: 0};
           percentiles.map(percentile => {
             lines.forEach(line => {
-              const matches = percentileReg(percentile).exec(line);
+              const matches = regexs.percentile(percentile).exec(line);
               if (matches) {
                 item.percentiles[percentile] = getMillis(matches[1].trim());
               }
             });
           });
           lines.forEach(line => {
-            let matches = totalReg.exec(line);
+            let matches = regexs.total.exec(line);
             if (matches) {
               item.total = Number(matches[1].trim());
             }
-            matches = errReg.exec(line);
+            matches = regexs.error.exec(line);
             if (matches) {
               item.error = Number(matches[1].trim());
+            }
+            matches = regexs.throughput.exec(line);
+            if (matches) {
+              item.throughput = Number(matches[1].trim());
             }
           });
         }
@@ -76,18 +84,28 @@
       function drawChart(report) {
         console.log('draw chart for report', report);
 
-        const rows = [['Throughput (Req/s)'].concat(percentiles)];
-        const errRows = [['Throughput (Req/s)', 'Error Rate']];
+        const latencyRows = [['Rate (Req/s)'].concat(percentiles)];
+        const throughputRows = [['Rate (Req/s)', 'Throughput']];
+        const errRows = [['Rate (Req/s)', 'Error Rate']];
 
-        for (const throughput in report) {
-          const item = report[throughput];
-          rows.push([throughput].concat(Object.values(item.percentiles)));
-          errRows.push([throughput, item.error / item.total]);
+        for (const rate in report) {
+          const item = report[rate];
+          latencyRows.push([rate].concat(Object.values(item.percentiles)));
+          throughputRows.push([rate, item.throughput]);
+          errRows.push([rate, item.error / item.total]);
         }
 
         new google.visualization.LineChart(document.getElementById('latency'))
-          .draw(google.visualization.arrayToDataTable(rows), {
-            title: 'Latency by Throughput',
+          .draw(google.visualization.arrayToDataTable(latencyRows), {
+            title: 'Latency by Rate',
+            curveType: 'function',
+            // width: 1500,
+            // height: 600,
+          });
+        
+        new google.visualization.LineChart(document.getElementById('throughput'))
+          .draw(google.visualization.arrayToDataTable(throughputRows), {
+            title: 'Throughput by Rate',
             curveType: 'function',
             // width: 1500,
             // height: 600,
@@ -95,7 +113,7 @@
 
         new google.visualization.LineChart(document.getElementById('error-rate'))
           .draw(google.visualization.arrayToDataTable(errRows), {
-            title: 'Error Rate by Throughput',
+            title: 'Error Rate by Rate',
             curveType: 'function',
             // width: 1500,
             // height: 600,
@@ -108,6 +126,7 @@
 <h1>HTTP Benchmark Result</h1>
 <label>Select file here to render</label> <input type="file" id="input" onchange="onInputChange(this.files)">
 <div id="latency" style="width: 100%; height: 600px"></div>
+<div id="throughput" style="width: 100%; height: 600px"></div>
 <div id="error-rate" style="width: 100%; height: 600px"></div>
 </body>
 </html>
